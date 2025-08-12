@@ -5,8 +5,9 @@
   "description": "An AI File Analyzer application",
   "main": "src/server/index.js",
   "scripts": {
-    "start": "node src/server/index.js",
+    "start": "node start.js",
     "dev": "node src/server/index.js",
+    "server": "node src/server/index.js",
     "build": "mkdir -p public/css && npx tailwindcss -i ./public/css/input.css -o ./public/css/output.css --minify",
     "build:watch": "npx tailwindcss -i ./public/css/input.css -o ./public/css/output.css --watch"
   },
