@@ -1,5 +1,5 @@
 run = "npm run dev"
-modules = ["nodejs-20", "python-3.11", "web"]
+modules = ["nodejs-20", "web"]
 
 # Environment configuration
 [nix]
@@ -24,8 +24,7 @@ externalPort = 8000
 
 # Deployment settings
 [deployment]
-build = ["sh", "-c", "npm install --legacy-peer-deps && mkdir -p public/css && npx tailwindcss -i ./public/css/input.css -o ./public/css/output.css --minify"]
-run = ["sh", "-c", "node src/server/index.js"]
+run = ["sh", "-c", "npm run dev"]
 deploymentTarget = "autoscale"
 
 # Replit deployment configuration for static files and API routes
