@@ -4,7 +4,7 @@ import fs from 'fs';
 import pdf from 'pdf-parse';
 import mammoth from 'mammoth';
 import Tesseract from 'tesseract.js';
-import * as xlsx from 'xlsx';
+import ExcelJS from 'exceljs';
 
 /**
  * अपलोड की गई फ़ाइल से टेक्स्ट निकालता है।
@@ -43,13 +43,22 @@ export async function extractTextFromFile(file) {
     } 
     
     else if (fileType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || fileType === 'application/vnd.ms-excel') {
-      const workbook = xlsx.readFile(filePath);
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.readFile(filePath);
       let fullText = '';
-      workbook.SheetNames.forEach(sheetName => {
-        const worksheet = workbook.Sheets[sheetName];
-        const csvData = xlsx.utils.sheet_to_csv(worksheet);
-        fullText += `--- Sheet: ${sheetName} ---\n${csvData}\n\n`;
+      
+      workbook.eachSheet((worksheet, sheetId) => {
+        fullText += `--- Sheet: ${worksheet.name} ---\n`;
+        worksheet.eachRow((row, rowNumber) => {
+          const rowValues = [];
+          row.eachCell((cell, colNumber) => {
+            rowValues.push(cell.value || '');
+          });
+          fullText += rowValues.join(',') + '\n';
+        });
+        fullText += '\n';
       });
+      
       return fullText;
     }
 
