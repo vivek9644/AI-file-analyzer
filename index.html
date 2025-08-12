@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, shrink-to-fit=no">
+    <title>AI Nexus Studio - Professional AI Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/public/css/output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <link rel="stylesheet" href="public/css/voice-chat.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@300;400;600;700&family=Noto+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="public/real-time-db.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Personalization Pro Styles -->
+    <style>
+        .dynamic-theme-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--accent-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            z-index: 9999;
+            animation: fadeInOut 3s ease-in-out;
+        }
+
+        .collaboration-panel {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 300px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            display: none;
+        }
+
+        .collaboration-panel.active {
+            display: block;
+            animation: slideInRight 0.3s ease;
+        }
+
+        .user-cursor {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            z-index: 1000;
+            pointer-events: none;
+            animation: pulse 2s infinite;
+        }
+
+        .version-history-item {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 5px 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .version-history-item:hover {
+            background: var(--bg-primary);
+            transform: translateX(5px);
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+    </style></head>
+<body data-theme="light">
+    <!-- Desktop Container -->
+    <div class="desktop-container">
+        <!-- Mobile Overlay -->
+        <div class="mobile-overlay" id="mobile-overlay"></div>
+
+        <!-- Sidebar -->
+        <div class="desktop-sidebar" id="sidebar">
+            <!-- Sidebar Header -->
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <div class="brand-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="brand-text">
+                        <h4>AI Nexus Studio</h4>
+                        <p>Advanced AI Platform</p>
+                    </div>
+                </div>
+
+                <!-- User Profile -->
+                <div class="user-profile-card" id="user-profile">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-info">
+                        <h6>Guest User</h6>
+                        <p>Free Plan</p>
+                    </div>
+                    <button class="btn btn-header btn-primary" id="login-btn">
+                        Login
+                    </button>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="sidebar-nav">
+                <!-- AI Capabilities -->
+                <div class="nav-section">
+                    <div class="nav-section-title">
+                        <i class="fas fa-robot me-2"></i>AI Capabilities
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="nav-link active">
+                            <i class="fas fa-comments"></i>
+                            Smart Chat
+                            <span class="nav-badge">Active</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-file-alt"></i>
+                            File Analysis
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-image"></i>
+                            Image Generator
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-code"></i>
+                            Code Assistant
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-search"></i>
+                            Web Research
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Business AI Suite -->
+                <div class="nav-section">
+                    <div class="nav-section-title">
+                        <i class="fas fa-briefcase me-2"></i>Business AI Suite
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="nav-link" id="meeting-summary-btn">
+                            <i class="fas fa-microphone"></i>
+                            Meeting Summary++
+                            <span class="nav-badge">New</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="nav-link" id="financial-ai-btn">
+                            <i class="fas fa-chart-line"></i>
+                            Financial AI Analyst
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Education Hub -->
+                <div class="nav-section">
+                    <div class="nav-section-title">
+                        <i class="fas fa-graduation-cap me-2"></i>Education Hub
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="nav-link" id="learning-path-btn">
+                            <i class="fas fa-route"></i>
+                            Personalized Learning
+                        </a>
+                    </div>
+                    <div class="nav-item">
+
+
+                <!-- Analytics Dashboard Section -->
+                <div class="nav-section">
+                    <div class="nav-section-title">
+                        <i class="fas fa-chart-line me-2"></i>Analytics Pro
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="nav-link" id="analytics-dashboard-btn">
+                            <i class="fas fa-tachometer-alt"></i>
+                            Advanced Analytics
+                            <span class="nav-badge">Live</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Integration Pro Section -->
+                <div class="sidebar-section">
+                    <div class="section-title">🔗 Integration Pro</div>
+                    <button id="workspace-sync-btn" class="sidebar-btn">
+                        <i class="fab fa-google"></i>
+                        <span>Google Workspace Sync</span>
+                    </button>
+                    <button id="web-scraper-btn" class="sidebar-btn">
+                        <i class="fas fa-spider"></i>
+                        <span>Smart Web Scraper</span>
+                    </button>
+                </div>
+
+                <!-- Mobile AI Section -->
+                <div class="sidebar-section">
+                    <div class="section-title">📱 Mobile AI</div>
+                    <button id="offline-ai-btn" class="sidebar-btn">
+                        <i class="fas fa-brain"></i>
+                        <span>Hybrid Offline AI</span>
+                    </button>
+                    <button id="ar-visualization-btn" class="sidebar-btn">
+                        <i class="fas fa-cube"></i>
+                        <span>AR Visualization</span>
+                    </button>
+                </div>
+
+                        <a href="#" class="nav-link" id="coding-lab-btn">
+                            <i class="fas fa-laptop-code"></i>
+                            Interactive Coding Lab
+                            <span class="nav-badge">Live</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Chat Export & Templates -->
+                <div class="nav-section">
+                    <div class="nav-section-title">
+                        <i class="fas fa-file-export me-2"></i>Export & Templates
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="nav-link" id="chat-export-btn">
+                            <i class="fas fa-download"></i>
+                            Chat Export System
+                            <span class="nav-badge">Pro</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="nav-link" id="template-library-btn">
+                            <i class="fas fa-layer-group"></i>
+                            Template Library AI
+                            <span class="nav-badge">New</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Recent Chats -->
+                <div class="nav-section">
+                    <div class="nav-section-title">
+                        <i class="fas fa-history me-2"></i>Recent Chats
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-message"></i>
+                            Bootstrap Project Help
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-image"></i>
+                            Logo Design Ideas
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-code"></i>
+                            JavaScript Debugging
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Settings -->
+                <div class="nav-section">
+                    <div class="nav-section-title">
+                        <i class="fas fa-cog me-2"></i>Settings
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-palette"></i>
+                            Theme Settings
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-bell"></i>
+                            Notifications
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-key"></i>
+                            API Settings
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="desktop-main">
+            <!-- Header -->
+            <div class="desktop-header">
+                <div class="header-left">
+                    <button class="btn btn-header mobile-menu" id="mobile-menu-btn">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <button class="btn btn-primary" id="new-chat">
+                        <i class="fas fa-plus me-2"></i><span>New Chat</span>
+                    </button>
+                </div>
+                <div class="header-right">
+                    <select class="form-select model-selector" id="ai-model-selector">
+                        <option value="google-gemini-2.0-flash" selected>Google Gemini 2.0</option>
+                        <option value="openrouter-deepseek-r1t2">OpenRouter DeepSeek</option>
+                        <option value="puter-gpt-4o">Puter.js GPT-4o</option>
+                        <option value="puter-dalle3">Puter.js DALL-E 3</option>
+                    </select>
+
+                    <!-- Personalization Pro Controls -->
+                    <button class="btn btn-header" id="avatar-creator-btn" title="AI Avatar Creator">
+                        <i class="fas fa-user-plus"></i>
+                    </button>
+                    <button class="btn btn-header" id="dynamic-theme-btn" title="Dynamic Themes">
+                        <i class="fas fa-palette"></i>
+                    </button>
+
+                    <!-- Collaboration Controls -->
+                    <button class="btn btn-header" id="collaboration-btn" title="Collaboration Suite">
+                        <i class="fas fa-users"></i>
+                    </button>
+                    <button class="btn btn-header" id="version-history-btn" title="Version History">
+                        <i class="fas fa-history"></i>
+                    </button>
+
+                    <button class="theme-toggle" id="theme-toggle">
+                        <i class="fas fa-sun"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat Container -->
+            <div class="chat-container">
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Welcome Message -->
+                    <div class="message-wrapper animate-fade-in">
+                        <div class="message-avatar ai-avatar-msg">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="message-bubble welcome-message">
+                            <h3 class="welcome-title">
+                                🧠 Welcome to AI Nexus Studio!
+                            </h3>
+                            <h6 style="color: var(--text-secondary); margin-bottom: 15px;">
+                                Artificial Intelligence Multi-Model Assistant Platform
+                            </h6>
+                            <p style="color: var(--text-primary); margin-bottom: 20px;">
+                                I am a multi-model AI assistant. Select a model from above and ask me anything:
+                            </p>
+
+                            <div class="feature-grid">
+                                <div class="feature-card">
+                                    <h6>🔮 Google Gemini 2.0</h6>
+                                    <p>Complex questions & analysis</p>
+                                </div>
+                                <div class="feature-card">
+                                    <h6>🚀 OpenRouter DeepSeek</h6>
+                                    <p>Creative & detailed responses</p>
+                                </div>
+                                <div class="feature-card">
+                                    <h6>💬 Puter.js GPT-4o</h6>
+                                    <p>Free text generation</p>
+                                </div>
+                                <div class="feature-card">
+                                    <h6>🎨 Puter.js DALL-E 3</h6>
+                                    <p>Free image generation</p>
+                                </div>
+                            </div>
+
+                            <div style="background-color: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-top: 20px;">
+                                <p style="margin: 0; color: var(--text-secondary); font-size: 14px;">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Start by typing a message below or uploading a file for analysis
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input Area -->
+                <div class="input-area">
+                    <!-- File Pills -->
+                    <div class="file-pills" id="file-list"></div>
+
+                    <!-- Input Form -->
+                    <form class="input-form" id="chat-form">
+                        <input type="file" id="file-input" multiple style="display: none;">
+                        <label for="file-input" class="file-upload-btn">
+                            <i class="fas fa-paperclip"></i>
+                        </label>
+
+                        <textarea 
+                            class="message-input" 
+                            id="message-input"
+                            placeholder="Ask anything or describe an image to generate..."
+                            rows="1"
+                        ></textarea>
+
+                        <button type="submit" class="send-btn" id="send-button">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+
+                    <!-- Loading Animation -->
+                    <div id="loading-animation" style="display: none; margin-top: 10px;">
+                        <div class="loading-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <span style="color: var(--text-secondary); font-size: 14px; margin-left: 10px;">AI is thinking...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1. पहले सभी external libraries को load करें -->
+    
+    <!-- Marked.js for Markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+
+    <!-- Puter.js Library for free OpenAI access -->
+    <script src="https://js.puter.com/v2/"></script>
+
+    <!-- Chart.js for Analytics Dashboard -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Bootstrap JavaScript - यह सबसे important है -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Dynamic Theme Indicator -->
+    <div class="dynamic-theme-indicator" id="theme-indicator" style="display: none;">
+        🌅 Morning Theme Active
+    </div>
+
+    <!-- Collaboration Panel -->
+    <div class="collaboration-panel" id="collaboration-panel">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6><i class="fas fa-users me-2"></i>Collaboration Suite</h6>
+            <button class="btn-close" id="close-collaboration"></button>
+        </div>
+
+        <!-- Online Users -->
+        <div class="mb-3">
+            <label class="form-label">🟢 Online Users (3)</label>
+            <div class="online-users">
+                <div class="user-chip active-user">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user1" width="24" height="24" style="border-radius: 50%;">
+                    <span>Rahul Kumar</span>
+                    <span class="typing-indicator">typing...</span>
+                </div>
+                <div class="user-chip">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user2" width="24" height="24" style="border-radius: 50%;">
+                    <span>Priya Singh</span>
+                </div>
+                <div class="user-chip">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user3" width="24" height="24" style="border-radius: 50%;">
+                    <span>You</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Real-time Co-editing Status -->
+        <div class="mb-3">
+            <label class="form-label">📝 Real-time Editing</label>
+            <div class="editing-status">
+                <div class="d-flex justify-content-between">
+                    <span>Co-editing Mode</span>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="co-editing-toggle" checked>
+                    </div>
+                </div>
+                <small class="text-muted">Google Docs style live collaboration</small>
+            </div>
+        </div>
+
+        <!-- Share Session -->
+        <div class="mb-3">
+            <label class="form-label">🔗 Share Session</label>
+            <div class="input-group">
+                <input type="text" class="form-control" value="https://ai-nexus.replit.app/session/abc123" readonly>
+                <button class="btn btn-outline-primary" onclick="copyToClipboard()">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Avatar Creator Modal -->
+    <div class="modal fade" id="avatarCreatorModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="background: var(--bg-primary); border: 1px solid var(--border-color);">
+                <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
+                    <h5 class="modal-title">🎨 AI Avatar Creator</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Create Your AI Avatar</h6>
+                            <div class="mb-3">
+                                <label class="form-label">Avatar Style</label>
+                                <select class="form-select" id="avatar-style">
+                                    <option value="professional">Professional</option>
+                                    <option value="cartoon">Cartoon</option>
+                                    <option value="anime">Anime</option>
+                                    <option value="robot">Robot/AI</option>
+                                    <option value="abstract">Abstract</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Avatar Description</label>
+                                <textarea class="form-control" id="avatar-description" rows="3" placeholder="Describe your ideal AI avatar (e.g., 'A friendly robot with blue eyes and a modern design')"></textarea>
+                            </div>
+                            <button class="btn btn-primary" id="generate-avatar-btn">
+                                <i class="fas fa-magic me-2"></i>Generate with DALL-E
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Preview</h6>
+                            <div class="avatar-preview" id="avatar-preview" style="min-height: 200px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                <span class="text-muted">Your avatar will appear here</span>
+                            </div>
+                            <div class="mt-3" id="avatar-actions" style="display: none;">
+                                <button class="btn btn-success me-2" id="save-avatar-btn">
+
+
+<!-- Integration Pro Modals -->
+<!-- Google Workspace Sync Modal -->
+<div class="modal fade" id="workspaceSyncModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">🔗 Google Workspace Integration</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="workspace-status" class="mb-4">
+                    <!-- Workspace status will be populated by JavaScript -->
+                </div>
+
+                <div class="text-center mb-4">
+                    <button id="connect-google-btn" class="btn btn-primary">
+                        <i class="fab fa-google me-2"></i>Connect Google Workspace
+                    </button>
+                </div>
+
+                <div id="sync-actions" style="display: none;">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <button id="sync-calendar-btn" class="btn btn-outline-info w-100">
+                                <i class="fas fa-calendar me-2"></i>Sync Calendar
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button id="sync-drive-btn" class="btn btn-outline-warning w-100">
+                                <i class="fas fa-folder me-2"></i>Sync Drive
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button id="sync-gmail-btn" class="btn btn-outline-danger w-100">
+                                <i class="fas fa-envelope me-2"></i>Sync Gmail
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="sync-output" class="mt-4">
+                    <!-- Sync results will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Smart Web Scraper Modal -->
+<div class="modal fade" id="webScraperModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">🕷️ Smart Web Scraper</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="scraper-config mb-4">
+                    <div class="mb-3">
+                        <label for="scraper-url" class="form-label">Target URL</label>
+                        <input type="url" class="form-control" id="scraper-url" placeholder="https://example.com">
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="captcha-bypass" checked>
+                                <label class="form-check-label" for="captcha-bypass">
+                                    <i class="fas fa-shield-alt text-primary me-2"></i>CAPTCHA Bypass
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="dynamic-content" checked>
+                                <label class="form-check-label" for="dynamic-content">
+                                    <i class="fas fa-magic text-info me-2"></i>Dynamic Content Loading
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="start-scraping-btn" class="btn btn-primary">
+                        <i class="fas fa-play me-2"></i>Start Smart Scraping
+                    </button>
+                </div>
+
+                <div id="scraper-output">
+                    <!-- Scraping results will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile AI Modals -->
+<!-- Hybrid Offline AI Modal -->
+<div class="modal fade" id="offlineAIModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">🧠 Hybrid Offline AI</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="offline-status" class="mb-4">
+                    <!-- Offline AI status will be populated by JavaScript -->
+                </div>
+
+                <div class="text-center mb-4">
+                    <button id="load-tinyml-btn" class="btn btn-primary">
+                        <i class="fas fa-download me-2"></i>Load TinyML Models
+                    </button>
+                </div>
+
+                <div id="offline-actions" style="display: none;">
+                    <div class="text-center mb-3">
+                        <button id="test-offline-btn" class="btn btn-success">
+                            <i class="fas fa-play me-2"></i>Test Offline Capabilities
+                        </button>
+                    </div>
+                </div>
+
+                <div id="offline-output">
+                    <!-- Offline AI results will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AR Visualization Modal -->
+<div class="modal fade" id="arVisualizationModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">📱 AR Visualization</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div id="ar-camera" class="ar-camera-container">
+                            <!-- AR camera view will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div id="ar-status" class="mb-3">
+                            <div class="text-center p-3">
+                                <i class="fas fa-camera-retro fa-2x text-muted mb-2"></i>
+                                <p class="text-muted">AR Camera Ready</p>
+                            </div>
+                        </div>
+
+                        <div class="text-center mb-3">
+                            <button id="start-ar-btn" class="btn btn-primary w-100">
+                                <i class="fas fa-play me-2"></i>Start AR
+                            </button>
+                        </div>
+
+                        <div id="ar-actions" style="display: none;">
+                            <button id="scan-object-btn" class="btn btn-info w-100 mb-2">
+                                <i class="fas fa-cube me-2"></i>Scan Object for 3D
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ar-output" class="mt-4">
+                    <!-- AR visualization results will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+                                    <i class="fas fa-check me-2"></i>Use This Avatar
+                                </button>
+                                <button class="btn btn-secondary" id="regenerate-avatar-btn">
+                                    <i class="fas fa-redo me-2"></i>Regenerate
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dynamic Themes Modal -->
+    <div class="modal fade" id="dynamicThemesModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background: var(--bg-primary); border: 1px solid var(--border-color);">
+                <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
+                    <h5 class="modal-title">🌈 Dynamic Themes Pro</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="auto-theme-toggle">
+                            <label class="form-check-label">Auto Theme Switching</label>
+                        </div>
+                        <small class="text-muted">Automatically change themes based on time and weather</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Theme Schedule</label>
+                        <div class="theme-schedule">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span>🌅 Morning (6AM-12PM)</span>
+                                <select class="form-select w-auto">
+                                    <option>Sunrise Orange</option>
+                                    <option>Fresh Blue</option>
+                                    <option>Nature Green</option>
+                                </select>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span>☀️ Afternoon (12PM-6PM)</span>
+                                <select class="form-select w-auto">
+                                    <option>Sky Blue</option>
+                                    <option>Bright Yellow</option>
+                                    <option>Ocean Teal</option>
+                                </select>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span>🌅 Evening (6PM-10PM)</span>
+                                <select class="form-select w-auto">
+                                    <option>Sunset Purple</option>
+                                    <option>Warm Orange</option>
+                                    <option>Twilight Blue</option>
+                                </select>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>🌙 Night (10PM-6AM)</span>
+                                <select class="form-select w-auto">
+                                    <option>Dark Mode</option>
+                                    <option>Deep Blue</option>
+                                    <option>Midnight Purple</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Weather-based Themes</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="weather-themes">
+                            <label class="form-check-label">Enable weather-responsive themes</label>
+                        </div>
+                        <small class="text-muted">Theme adapts to local weather conditions</small>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid var(--border-color);">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="save-theme-settings">Save Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Version History Modal -->
+    <div class="modal fade" id="versionHistoryModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="background: var(--bg-primary); border: 1px solid var(--border-color);">
+                <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
+                    <h5 class="modal-title">📚 Version History & Tracking</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6>Chat History Versions</h6>
+                            <div class="version-list" id="chat-versions">
+                                <div class="version-history-item active">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Current Session</span>
+                                        <span class="badge bg-success">Live</span>
+                                    </div>
+                                    <small class="text-muted">15 messages • 2 hours ago</small>
+                                </div>
+                                <div class="version-history-item">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Version 2.3</span>
+                                        <span class="badge bg-primary">Auto-saved</span>
+                                    </div>
+                                    <small class="text-muted">12 messages • 4 hours ago</small>
+                                </div>
+                                <div class="version-history-item">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Version 2.2</span>
+                                        <span class="badge bg-secondary">Manual</span>
+                                    </div>
+                                    <small class="text-muted">8 messages • Yesterday</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <h6>Version Comparison</h6>
+                            <div class="version-comparison">
+                                <div class="comparison-view" style="background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; min-height: 300px;">
+                                    <div class="text-center text-muted">
+                                        <i class="fas fa-code-branch fa-3x mb-3"></i>
+                                        <p>Select versions to compare changes</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <button class="btn btn-outline-primary me-2">
+                                    <i class="fas fa-download me-2"></i>Export Version
+                                </button>
+                                <button class="btn btn-outline-success me-2">
+                                    <i class="fas fa-undo me-2"></i>Restore Version
+                                </button>
+                                <button class="btn btn-outline-info">
+                                    <i class="fas fa-share me-2"></i>Share Version
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Meeting Summary++ Modal -->
+    <div class="modal fade" id="meetingSummaryModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content" style="background: var(--bg-primary); border: 1px solid var(--border-color);">
+                <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
+                    <h5 class="modal-title">🎙️ Meeting Summary++ with AI Transcription</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>📹 Audio/Video Upload</h6>
+                            <div class="upload-zone" style="border: 2px dashed var(--border-color); border-radius: 8px; padding: 30px; text-align: center; margin-bottom: 20px;">
+                                <i class="fas fa-cloud-upload-alt fa-3x mb-3" style="color: var(--accent-color);"></i>
+                                <p>Drag & drop meeting recording here</p>
+                                <p class="text-muted">Supports MP3, MP4, WAV, M4A (Max 500MB)</p>
+                                <input type="file" id="meeting-file" accept="audio/*,video/*" style="display: none;">
+                                <button class="btn btn-primary" onclick="document.getElementById('meeting-file').click()">
+                                    Choose File
+                                </button>
+                            </div>
+
+                            <h6>🎛️ AI Processing Options</h6>
+                            <div class="mb-3">
+                                <label class="form-label">Speaker Identification</label>
+                                <select class="form-select" id="speaker-count">
+                                    <option value="auto">Auto-detect speakers</option>
+                                    <option value="2">2 speakers</option>
+                                    <option value="3">3 speakers</option>
+                                    <option value="4">4 speakers</option>
+                                    <option value="5+">5+ speakers</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Meeting Type</label>
+                                <select class="form-select" id="meeting-type">
+                                    <option value="business">Business Meeting</option>
+                                    <option value="standup">Daily Standup</option>
+                                    <option value="interview">Interview</option>
+                                    <option value="training">Training Session</option>
+                                    <option value="brainstorm">Brainstorming</option>
+                                </select>
+                            </div>
+
+                            <button class="btn btn-success w-100" id="process-meeting-btn">
+                                <i class="fas fa-cogs me-2"></i>Process with AI Transcription
+                            </button>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h6>📝 AI-Generated Summary</h6>
+                            <div class="meeting-output" id="meeting-output" style="background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; min-height: 400px; max-height: 500px; overflow-y: auto;">
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-microphone fa-2x mb-3"></i>
+                                    <p>Upload a meeting recording to get started</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Financial AI Analyst Modal -->
+    <div class="modal fade" id="financialAIModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content" style="background: var(--bg-primary); border: 1px solid var(--border-color);">
+                <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
+                    <h5 class="modal-title">📈 Financial AI Analyst - Market Prediction Engine</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6>🎯 Analysis Target</h6>
+                            <div class="mb-3">
+                                <label class="form-label">Market Type</label>
+                                <select class="form-select" id="market-type">
+                                    <option value="stocks">Stock Market</option>
+                                    <option value="crypto">Cryptocurrency</option>
+                                    <option value="forex">Forex</option>
+                                    <option value="commodities">Commodities</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Asset Symbol</label>
+                                <input type="text" class="form-control" id="asset-symbol" placeholder="e.g., AAPL, BTC, USD/INR" value="AAPL">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Prediction Timeframe</label>
+                                <select class="form-select" id="prediction-timeframe">
+                                    <option value="1d">1 Day</option>
+                                    <option value="1w">1 Week</option>
+                                    <option value="1m">1 Month</option>
+                                    <option value="3m">3 Months</option>
+                                    <option value="6m">6 Months</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="sentiment-analysis" checked>
+                                    <label class="form-check-label">News Sentiment Analysis</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="technical-indicators" checked>
+                                    <label class="form-check-label">Technical Indicators</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="ai-patterns" checked>
+                                    <label class="form-check-label">AI Pattern Recognition</label>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-primary w-100" id="analyze-market-btn">
+                                <i class="fas fa-chart-area me-2"></i>Analyze & Predict
+                            </button>
+                        </div>
+
+                        <div class="col-md-8">
+                            <div class="financial-dashboard" id="financial-dashboard">
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <div class="metric-card" style="background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; text-align: center;">
+                                            <h6>Current Price</h6>
+                                            <h4 class="text-success" id="current-price">$150.25</h4>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="metric-card" style="background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; text-align: center;">
+                                            <h6>AI Prediction</h6>
+                                            <h4 class="text-primary" id="ai-prediction">$158.40</h4>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="metric-card" style="background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; text-align: center;">
+                                            <h6>Confidence</h6>
+                                            <h4 class="text-warning" id="confidence-score">87%</h4>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="metric-card" style="background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; text-align: center;">
+                                            <h6>Risk Level</h6>
+                                            <h4 class="text-info" id="risk-level">Medium</h4>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="analysis-output" id="financial-analysis" style="background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; min-height: 300px;">
+                                    <div class="text-center text-muted">
+                                        <i class="fas fa-chart-line fa-3x mb-3"></i>
+                                        <p>Select an asset and click "Analyze & Predict" to get AI-powered market insights</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Personalized Learning Path Modal -->
+    <div class="modal fade" id="learningPathModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content" style="background: var(--bg-primary); border: 1px solid var(--border-color);">
+                <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
+                    <h5 class="modal-title">🎯 Personalized Learning Path Generator</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6>📚 Learning Preferences</h6>
+                            <div class="mb-3">
+                                <label class="form-label">Subject Area</label>
+                                <select class="form-select" id="subject-area">
+                                    <option value="programming">Programming</option>
+                                    <option value="data-science">Data Science</option>
+                                    <option value="web-dev">Web Development</option>
+                                    <option value="mobile-dev">Mobile Development</option>
+                                    <option value="ai-ml">AI/Machine Learning</option>
+                                    <option value="cybersecurity">Cybersecurity</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Current Skill Level</label>
+                                <select class="form-select" id="skill-level">
+                                    <option value="beginner">Beginner</option>
+                                    <option value="intermediate">Intermediate</option>
+                                    <option value="advanced">Advanced</option>
+                                    <option value="expert">Expert</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Learning Style</label>
+                                <select class="form-select" id="learning-style">
+                                    <option value="visual">Visual (Charts, Diagrams)</option>
+                                    <option value="hands-on">Hands-on (Practice Projects)</option>
+                                    <option value="reading">Reading (Text-based)</option>
+                                    <option value="mixed">Mixed Approach</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Time Commitment (per day)</label>
+                                <select class="form-select" id="time-commitment">
+                                    <option value="30min">30 minutes</option>
+                                    <option value="1hr">1 hour</option>
+                                    <option value="2hr">2 hours</option>
+                                    <option value="4hr">4+ hours</option>
+                                </select>
+                            </div>
+
+                            <button class="btn btn-success w-100" id="generate-path-btn">
+                                <i class="fas fa-route me-2"></i>Generate Learning Path
+                            </button>
+                        </div>
+
+                        <div class="col-md-8">
+                            <h6>🛤️ Your Custom Learning Journey</h6>
+                            <div class="learning-path-output" id="learning-path-output" style="background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; min-height: 400px; max-height: 500px; overflow-y: auto;">
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-graduation-cap fa-3x mb-3"></i>
+                                    <p>Configure your preferences and generate a personalized learning path</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Coding Lab Modal -->
+    <div class="modal fade" id="codingLabModal" tabindex="-1">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content" style="background: var(--bg-primary); border: 1px solid var(--border-color);">
+                <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
+                    <h5 class="modal-title">💻 Interactive Coding Lab - Browser IDE</h5>
+                    <div class="coding-lab-controls">
+                        <select class="form-select me-2" id="coding-language" style="width: auto;">
+                            <option value="javascript">JavaScript</option>
+                            <option value="python">Python</option>
+                            <option value="html">HTML/CSS</option>
+                            <option value="java">Java</option>
+                            <option value="cpp">C++</option>
+                        </select>
+                        <button class="btn btn-success me-2" id="run-code-btn">
+                            <i class="fas fa-play me-1"></i>Run
+                        </button>
+                        <button class="btn btn-warning me-2" id="debug-code-btn">
+                            <i class="fas fa-bug me-1"></i>Debug
+                        </button>
+                        <button class="btn btn-info me-2" id="share-code-btn">
+                            <i class="fas fa-share me-1"></i>Share
+                        </button>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="coding-lab-container" style="height: calc(100vh - 120px); display: flex;">
+                        <div class="code-editor-panel" style="flex: 1; border-right: 1px solid var(--border-color);">
+                            <div class="editor-header" style="background: var(--bg-secondary); padding: 10px; border-bottom: 1px solid var(--border-color);">
+                                <h6 class="mb-0">📝 Code Editor</h6>
+                            </div>
+                            <textarea id="code-editor" style="width: 100%; height: calc(100% - 50px); border: none; padding: 15px; font-family: 'Courier New', monospace; background: var(--bg-primary); color: var(--text-primary); resize: none;" placeholder="// Welcome to Interactive Coding Lab
+// Write your code here and click Run to execute
+
+console.log('Hello, AI Nexus Studio!');
+
+function fibonacci(n) {
+    if (n <= 1) return n;
+    return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+console.log('Fibonacci sequence:');
+for (let i = 0; i < 10; i++) {
+    console.log(fibonacci(i));
+}"></textarea>
+                        </div>
+
+                        <div class="output-panel" style="flex: 1; display: flex; flex-direction: column;">
+                            <div class="output-header" style="background: var(--bg-secondary); padding: 10px; border-bottom: 1px solid var(--border-color);">
+                                <h6 class="mb-0">🖥️ Output Console</h6>
+                            </div>
+                            <div class="console-output" id="console-output" style="flex: 1; padding: 15px; background: #1a1a1a; color: #00ff00; font-family: 'Courier New', monospace; overflow-y: auto;">
+                                <div class="console-welcome">
+                                    <p style="color: #00ff00;">AI Nexus Studio Interactive Coding Lab v1.0</p>
+                                    <p style="color: #ffff00;">Ready to execute code. Select language and click Run.</p>
+                                    <p style="color: #00ffff;">Supported: JavaScript, Python, HTML/CSS, Java, C++</p>
+                                    <div style="margin-top: 20px;">
+                                        <span style="color: #00ff00;">➜</span> <span style="color: #ffffff;">Waiting for input...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Export System Modal -->
+    <div class="modal fade" id="chatExportModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content" style="background: var(--bg-primary); border: 1px solid var(--border-color);">
+                <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
+                    <h5 class="modal-title">📤 Chat Export System Pro</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>🎛️ Export Configuration</h6>
+
+                            <div class="mb-3">
+                                <label class="form-label">Export Format</label>
+                                <select class="form-select" id="export-format">
+                                    <option value="PDF">PDF (Recommended)</option>
+                                    <option value="DOCX">Microsoft Word</option>
+                                    <option value="HTML">HTML Web Page</option>
+                                    <option value="JSON">JSON Data</option>
+                                    <option value="Markdown">Markdown</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Export Options</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="include-timestamps" checked>
+                                    <label class="form-check-label">Include Timestamps</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="include-metadata" checked>
+                                    <label class="form-check-label">Include Metadata & Context</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="include-attachments">
+                                    <label class="form-check-label">Include File Attachments</label>
+                                </div>
+                            </div>
+
+                            <h6>📄 Custom Header/Footer</h6>
+                            <div class="mb-3">
+                                <label class="form-label">Custom Header</label>
+                                <textarea class="form-control" id="custom-header" rows="2" placeholder="Add custom header text..."></textarea>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Header Font Size</label>
+                                    <input type="number" class="form-control" id="header-font-size" value="14" min="10" max="24">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Header Color</label>
+                                    <input type="color" class="form-control" id="header-color" value="#000000">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Custom Footer</label>
+                                <textarea class="form-control" id="custom-footer" rows="2" placeholder="Add custom footer text..."></textarea>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Footer Font Size</label>
+                                    <input type="number" class="form-control" id="footer-font-size" value="12" min="10" max="20">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Footer Color</label>
+                                    <input type="color" class="form-control" id="footer-color" value="#666666">
+                                </div>
+                            </div>
+
+                            <h6>🔒 Watermarking for Confidential Chats</h6>
+                            <div class="mb-3">
+                                <label class="form-label">Watermark Text</label>
+                                <input type="text" class="form-control" id="watermark-text" value="Confidential" placeholder="Watermark text">
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Opacity</label>
+                                    <input type="range" class="form-range" id="watermark-opacity" min="0.1" max="1" step="0.1" value="0.3">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Position</label>
+                                    <select class="form-select" id="watermark-position">
+                                        <option value="center">Center</option>
+                                        <option value="diagonal">Diagonal</option>
+                                        <option value="top">Top</option>
+                                        <option value="bottom">Bottom</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="confidential-only" checked>
+                                <label class="form-check-label">Only apply watermark to confidential chats</label>
+                            </div>
+
+                            <button class="btn btn-success w-100" id="export-chat-btn">
+                                <i class="fas fa-file-export me-2"></i>Export Chat
+                            </button>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h6>📋 Export Preview</h6>
+                            <div class="export-preview" id="export-output" style="background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; min-height: 400px; max-height: 500px; overflow-y: auto;">
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-file-export fa-3x mb-3"></i>
+                                    <p>Configure export settings and click "Export Chat" to preview</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid var(--border-color);">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="save-export-settings">Save Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template Library AI Modal -->
+    <div class="modal fade" id="templateLibraryModal" tabindex="-1">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content" style="background: var(--bg-primary); border: 1px solid var(--border-color);">
+                <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
+                    <h5 class="modal-title">📚 Template Library AI - Smart Templates</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="template-sidebar">
+                                <h6>🎯 Quick Actions</h6>
+                                <div class="d-grid gap-2 mb-4">
+                                    <button class="btn btn-primary" id="create-template-btn">
+                                        <i class="fas fa-plus me-2"></i>Create New Template
+                                    </button>
+                                    <button class="btn btn-info" id="browse-marketplace-btn">
+                                        <i class="fas fa-store me-2"></i>Browse Marketplace
+                                    </button>
+                                </div>
+
+                                <h6>📊 Template Categories</h6>
+                                <div class="template-categories">
+                                    <div class="category-item">
+                                        <span class="badge bg-primary me-2">5</span>Business
+                                    </div>
+                                    <div class="category-item">
+                                        <span class="badge bg-success me-2">3</span>Development
+                                    </div>
+                                    <div class="category-item">
+                                        <span class="badge bg-warning me-2">2</span>Personal
+                                    </div>
+                                    <div class="category-item">
+                                        <span class="badge bg-info me-2">4</span>Education
+                                    </div>
+                                </div>
+
+                                <h6 class="mt-4">🔥 Trending Templates</h6>
+                                <div class="trending-templates">
+                                    <div class="trending-item">
+                                        <i class="fas fa-fire text-danger me-2"></i>
+                                        <small>Business Email Pro</small>
+                                    </div>
+                                    <div class="trending-item">
+                                        <i class="fas fa-fire text-danger me-2"></i>
+                                        <small>Code Review Checklist</small>
+                                    </div>
+                                    <div class="trending-item">
+                                        <i class="fas fa-fire text-danger me-2"></i>
+                                        <small>Meeting Minutes AI</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-8">
+                            <div class="template-content">
+                                <!-- Template Creation Form (Initially Hidden) -->
+                                <div id="template-form" style="display: none;"></div>
+
+                                <!-- User Templates Tab -->
+                                <div class="template-tabs mb-3">
+                                    <ul class="nav nav-pills">
+                                        <li class="nav-item">
+                                            <a class="nav-link active" data-bs-toggle="pill" href="#user-templates-tab">My Templates</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-bs-toggle="pill" href="#marketplace-tab">Marketplace</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-bs-toggle="pill" href="#contextual-tab">AI Suggestions</a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="tab-content">
+                                    <!-- User Templates -->
+                                    <div class="tab-pane fade show active" id="user-templates-tab">
+                                        <h6>👤 Your Custom Templates</h6>
+                                        <div id="user-templates" style="max-height: 500px; overflow-y: auto;">
+                                            <!-- User templates will be populated by JavaScript -->
+                                        </div>
+                                    </div>
+
+                                    <!-- Template Marketplace -->
+                                    <div class="tab-pane fade" id="marketplace-tab">
+                                        <h6>🏪 Template Marketplace</h6>
+                                        <div class="marketplace-filters mb-3">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <select class="form-select form-select-sm">
+                                                        <option>All Categories</option>
+                                                        <option>Business</option>
+                                                        <option>Development</option>
+                                                        <option>Education</option>
+                                                        <option>Creative</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <select class="form-select form-select-sm">
+                                                        <option>Sort by Downloads</option>
+                                                        <option>Sort by Rating</option>
+                                                        <option>Sort by Recent</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <input type="search" class="form-control form-control-sm" placeholder="Search templates...">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="template-marketplace" style="max-height: 450px; overflow-y: auto;">
+                                            <!-- Marketplace templates will be populated by JavaScript -->
+                                        </div>
+                                    </div>
+
+                                    <!-- Contextual AI Suggestions -->
+                                    <div class="tab-pane fade" id="contextual-tab">
+                                        <h6>🤖 AI-Powered Contextual Suggestions</h6>
+                                        <div class="contextual-suggestions-info" style="background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                                            <h6>💡 How it works</h6>
+                                            <p class="mb-0">AI analyzes your message context and suggests relevant templates automatically. Start typing in the main chat to see suggestions!</p>
+                                        </div>
+
+                                        <div class="contextual-examples">
+                                            <h6>📝 Example Triggers</h6>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="example-card" style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; margin-bottom: 10px;">
+                                                        <strong>Type "email"</strong><br>
+                                                        <small class="text-muted">→ Suggests email templates</small>
+                                                    </div>
+                                                    <div class="example-card" style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; margin-bottom: 10px;">
+                                                        <strong>Type "meeting"</strong><br>
+                                                        <small class="text-muted">→ Suggests meeting templates</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="example-card" style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; margin-bottom: 10px;">
+                                                        <strong>Type "code review"</strong><br>
+                                                        <small class="text-muted">→ Suggests development templates</small>
+                                                    </div>
+                                                    <div class="example-card" style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; margin-bottom: 10px;">
+                                                        <strong>Type "report"</strong><br>
+                                                        <small class="text-muted">→ Suggests report templates</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid var(--border-color);">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="save-template-btn" style="display: none;">
+                        <i class="fas fa-save me-2"></i>Save Template
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- 2. उसके बाद custom scripts को proper order में load करें -->
+    
+    <!-- Analytics Dashboard -->
+    <script src="public/analytics-dashboard.js"></script>
+
+    <!-- Main Application Logic - सबसे अंत में load करें -->
+    <script src="public/script.js"></script>
+</body>
+</html>

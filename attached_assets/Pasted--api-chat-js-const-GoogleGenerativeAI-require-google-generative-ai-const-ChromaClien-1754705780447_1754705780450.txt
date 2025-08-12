@@ -1,0 +1,70 @@
+// api/chat.js
+
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { ChromaClient } = require("chromadb");
+const { pipeline } = await import('@xenova/transformers');
+
+// --- सेटअप (यह हिस्सा एक बार ही चलेगा) ---
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const chromaClient = new ChromaClient({ path: "http://localhost:8000" }); // आपके Docker कंटेनर का URL
+const embedder = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
+
+// एक फंक्शन जो टेक्स्ट को एम्बेडिंग में बदलता है
+async function getEmbedding(text) {
+    const result = await embedder(text, { pooling: 'mean', normalize: true });
+    return Array.from(result.data);
+}
+
+// --- मुख्य API लॉजिक ---
+module.exports = async (req, res) => {
+    if (req.method !== 'POST') {
+        return res.status(405).send({ message: 'Only POST requests allowed' });
+    }
+
+    try {
+        const { prompt, sessionId } = req.body; // हर यूजर के लिए एक यूनिक sessionId भेजें
+        if (!prompt || !sessionId) {
+            return res.status(400).send({ message: 'Prompt and sessionId are required' });
+        }
+
+        // 1. कलेक्शन पाएं या बनाएं (हर यूजर के लिए अलग)
+        const collection = await chromaClient.getOrCreateCollection({ name: `chat_${sessionId}` });
+
+        // 2. यूजर के सवाल का एम्बेडिंग बनाएं
+        const queryEmbedding = await getEmbedding(prompt);
+
+        // 3. वेक्टर डेटाबेस से मिलते-जुलते पुराने वार्तालाप खोजें
+        const relevantHistory = await collection.query({
+            queryEmbeddings: [queryEmbedding],
+            nResults: 5 // पिछले 5 मिलते-जुलते मैसेज निकालें
+        });
+
+        // 4. कॉन्टेक्स्ट तैयार करें
+        let context = "Relevant past conversation:\n";
+        if (relevantHistory.documents && relevantHistory.documents.length > 0) {
+            context += relevantHistory.documents[0].join("\n");
+        }
+
+        // 5. AI को कॉन्टेक्स्ट के साथ नया सवाल भेजें
+        const finalPrompt = `${context}\n\nNew Question: ${prompt}`;
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        const result = await model.generateContent(finalPrompt);
+        const aiResponse = result.response.text();
+
+        // 6. इस नई बातचीत को भी डेटाबेस में सेव करें ताकि भविष्य में काम आए
+        const userMessageEmbedding = queryEmbedding; // पहले से बना हुआ है
+        const aiMessageEmbedding = await getEmbedding(aiResponse);
+        
+        await collection.add({
+            ids: [`user_${Date.now()}`, `ai_${Date.now()}`],
+            embeddings: [userMessageEmbedding, aiMessageEmbedding],
+            documents: [`User: ${prompt}`, `AI: ${aiResponse}`]
+        });
+
+        res.status(200).json({ text: aiResponse });
+
+    } catch (error) {
+        console.error("Error in chat API:", error);
+        res.status(500).send({ message: 'Error processing your request' });
+    }
+};

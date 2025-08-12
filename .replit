@@ -1,0 +1,193 @@
+run = "npm run dev"
+modules = ["nodejs-20", "python-3.11", "web"]
+
+# Environment configuration
+[nix]
+channel = "stable-25_05"
+packages = ["nodejs_20", "npm-9_x", "redis", "docker-compose"]
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[[ports]]
+localPort = 6333
+externalPort = 6333
+
+[[ports]]
+localPort = 6379
+externalPort = 3000
+
+[[ports]]
+localPort = 8000
+externalPort = 8000
+
+# Deployment settings
+[deployment]
+build = ["sh", "-c", "npm install --legacy-peer-deps && mkdir -p public/css && npx tailwindcss -i ./public/css/input.css -o ./public/css/output.css --minify"]
+run = ["sh", "-c", "node src/server/index.js"]
+deploymentTarget = "autoscale"
+
+# Replit deployment configuration for static files and API routes
+[[deployment.responseHeaders]]
+path = "/public/*"
+name = "Cache-Control"
+value = "public, max-age=3600"
+
+[[deployment.rewrites]]
+from = "/api/*"
+dest = "/api/$1"
+
+[[deployment.rewrites]]
+from = "/*"
+dest = "/index.html"
+
+# Optional: Hide unnecessary files from the file tree
+hidden = ["package-lock.json", ".config"]
+
+[workflows]
+runButton = "Complete Setup"
+
+[[workflows.workflow]]
+name = "Fixed Start"
+author = 45872229
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install --legacy-peer-deps"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "mkdir -p public/css"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx tailwindcss -i ./public/css/input.css -o ./public/css/output.css --minify"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node src/server/index.js"
+
+[[workflows.workflow]]
+name = "Start Server"
+author = 45872229
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install --legacy-peer-deps"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "mkdir -p public/css"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node src/server/index.js"
+
+[[workflows.workflow]]
+name = "Full Stack with Redis"
+author = 45872229
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "redis-server --daemonize yes"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install --legacy-peer-deps"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "mkdir -p public/css"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx tailwindcss -i ./public/css/input.css -o ./public/css/output.css --minify"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node src/server/index.js"
+
+[[workflows.workflow]]
+name = "Start ChromaDB"
+author = 45872229
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pip3 install chromadb"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "chroma run --host 0.0.0.0 --port 8000 --path ./chroma"
+
+[[workflows.workflow]]
+name = "Development Server"
+author = 45872229
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install --legacy-peer-deps"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "mkdir -p public/css"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx tailwindcss -i ./public/css/input.css -o ./public/css/output.css --minify"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node src/server/index.js"
+
+[[workflows.workflow]]
+name = "Quick Start"
+author = 45872229
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node start.js"
+
+[[workflows.workflow]]
+name = "Clean Start"
+author = 45872229
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install --legacy-peer-deps"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "mkdir -p public/css"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node start.js"
+
+[[workflows.workflow]]
+name = "Complete Setup"
+author = 45872229
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install --legacy-peer-deps"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "mkdir -p public/css"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx tailwindcss -i ./public/css/input.css -o ./public/css/output.css --minify"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node src/server/index.js"
