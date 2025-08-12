@@ -45,7 +45,7 @@ dest = "/index.html"
 hidden = ["package-lock.json", ".config"]
 
 [workflows]
-runButton = "Complete Setup"
+runButton = "Clean Development"
 
 [[workflows.workflow]]
 name = "Fixed Start"
@@ -190,3 +190,24 @@ args = "npx tailwindcss -i ./public/css/input.css -o ./public/css/output.css --m
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "node src/server/index.js"
+
+[[workflows.workflow]]
+name = "Clean Development"
+author = 45872229
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install --legacy-peer-deps"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "mkdir -p public/css"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx tailwindcss -i ./public/css/input.css -o ./public/css/output.css --minify"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python -m http.server 5000 --directory ."
